@@ -1,35 +1,32 @@
 <?php
-
 include "connect.php";
 
-if($_SERVER["REQUEST_METHOD"] == "POST") {
-//GET FORM DATA
-    $email = mysqli_real_escape_string($conn , $_POST['email']);
-    $fullname = mysqli_real_escape_string($conn , $_POST['fullname']);
-    $password = mysqli_real_escape_string($conn , $_POST['password']);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get and escape form data
+    $fullname = mysqli_real_escape_string($conn, $_POST['fullname']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    //CHECK IF THE EMAIL IS ALREADY IN DATABASE
-
+    // Check if email already exists
     $checkEmail = "SELECT * FROM users WHERE email='$email'";
     $result = $conn->query($checkEmail);
 
-    if($result->num_rows > 0){
-        echo "Email already has a account";
+    if ($result->num_rows > 0) {
+        echo "Email already has an account.";
     } else {
+        // Hash password
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-    //CREATE ACCOUNT //SAVE DATA TO DATABASE
+        // CORRECT SQL SYNTAX – NO QUOTES AROUND COLUMN NAMES
+        $sql = "INSERT INTO users (fullname, email, password) VALUES ('$fullname', '$email', '$hashed_password')";
 
-    //SECURITY - HASHING
-    $hashed_password = password_hash($password , PASSWORD_BCRYPT);
-
-    $sql = "INSERT INTO users(fullname,email,password) VALUES ('$fullname', '$email','$hashed_password')";
-
-    if($conn->query($sql)===TRUE){
-        echo "ACCOUNT CREATED!!!";
-         } else {
-        echo "ERROR" .$sql.$conn->error;
+        if ($conn->query($sql) === TRUE) {
+            
+            echo "<script> alert('Account Created!!!') window.location.href = 'index.php';
+                  </script> ";
+        } else {
+            echo "Error: " . $conn->error;
         }
     }
 }
-
 ?>
