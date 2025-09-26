@@ -1,4 +1,5 @@
 <?php
+session_start();
 include "connect.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -15,21 +16,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     //CHECK IF PASSWORD IS CORRECT;
 
-if(password_verify($password, $user["password"])) {
-echo "login succesful! , Welcome". $user['fullname'];
-
-    //redirect to dashboard
-
-    header("Location: dashboard.php");
-}
-//redirect to dashboard..
-else {
-    echo "Wrong Password!";
-}
-
+if (password_verify($password, $user["password"])) {
+            $_SESSION['user'] = $user['email'];
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            echo "Wrong Password!";
+        }
     } else {
-        //email doesnt exist
-echo "NO USER WITH THAT EMAIL";
+        echo "No user with that email";
     }
 }
 ?>
